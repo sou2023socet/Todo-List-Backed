@@ -13,4 +13,6 @@ public interface TodoRepository extends MongoRepository<Todo, String> {
     Optional<Todo> findByIdAndTenantId(String id, String tenantId);
     Page<Todo> findByTenantIdAndSection(String tenantId, String section, Pageable pageable);
     List<String> findDistinctSectionByTenantId(String tenantId);
+    long countByTenantIdAndSection(String tenantId, String section);
+    long deleteByTenantIdAndSection(String tenantId, String section);
 }
