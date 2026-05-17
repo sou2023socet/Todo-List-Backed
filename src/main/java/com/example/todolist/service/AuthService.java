@@ -41,6 +41,15 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
+    public UserAccount findByUsernameOrEmailAndTenantId(String usernameOrEmail, String tenantId) {
+        if (usernameOrEmail.contains("@")) {
+            return userRepository.findByEmailAddressAndTenantId(usernameOrEmail, tenantId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for tenant"));
+        }
+        return userRepository.findByUsernameAndTenantId(usernameOrEmail, tenantId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found for tenant"));
+    }
+
     public UserAccount findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

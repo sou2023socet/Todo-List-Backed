@@ -3,6 +3,7 @@ package com.example.todolist.controller;
 import com.example.todolist.dto.ApiResponse;
 import com.example.todolist.dto.PageResponse;
 import com.example.todolist.model.Todo;
+import com.example.todolist.security.UserPrincipal;
 import com.example.todolist.model.UserAccount;
 import com.example.todolist.service.AuthService;
 import com.example.todolist.service.TodoService;
@@ -30,6 +31,11 @@ public class FrontendTodoController {
     }
 
     private String tenantIdFrom(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserPrincipal userPrincipal) {
+            return userPrincipal.getTenantId();
+        }
+
         UserAccount user = authService.findByUsername(authentication.getName());
         return user.getTenantId();
     }

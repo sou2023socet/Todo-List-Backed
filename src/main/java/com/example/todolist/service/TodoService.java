@@ -1,5 +1,6 @@
 package com.example.todolist.service;
 
+import com.example.todolist.dto.TodoRequest;
 import com.example.todolist.model.Todo;
 import com.example.todolist.repository.TodoRepository;
 import org.springframework.data.domain.Page;
@@ -28,23 +29,29 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("Todo not found for tenant"));
     }
 
-    public Todo createTodo(Todo todo, String tenantId, String username) {
+    public Todo createTodo(TodoRequest request, String tenantId, String username) {
+        Todo todo = new Todo();
+        applyRequestToTodo(todo, request);
         todo.setTenantId(tenantId);
         Todo saved = todoRepository.save(todo);
         auditService.log(username, tenantId, "CREATE", "Todo", saved.getId(), "Created new todo");
         return saved;
     }
 
-    public Todo updateTodo(String id, Todo updatedTodo, String tenantId, String username) {
+    public Todo updateTodo(String id, TodoRequest request, String tenantId, String username) {
         Todo existing = getTodoById(id, tenantId);
-        existing.setTopic(updatedTodo.getTopic());
-        existing.setSummaryPoints(updatedTodo.getSummaryPoints());
-        existing.setStatus(updatedTodo.getStatus());
-        existing.setPriority(updatedTodo.getPriority());
-        existing.setSection(updatedTodo.getSection());
+        applyRequestToTodo(existing, request);
         Todo saved = todoRepository.save(existing);
         auditService.log(username, tenantId, "UPDATE", "Todo", saved.getId(), "Updated todo fields");
         return saved;
+    }
+
+    private void applyRequestToTodo(Todo todo, TodoRequest request) {
+        todo.setTopic(request.getTopic());
+        todo.setSummaryPoints(request.getSummaryPoints());
+        todo.setStatus(request.getStatus());
+        todo.setPriority(request.getPriority());
+        todo.setSection(request.getSection());
     }
 
     public void deleteTodo(String id, String tenantId, String username) {

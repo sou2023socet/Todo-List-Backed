@@ -13,6 +13,8 @@ public class LoginRequest {
     @Size(min = 8, max = 128, message = "Password must be between 8 and 128 characters")
     private String password;
 
+    private String tenantId;
+
     public String getUsername() {
         return username;
     }
@@ -28,4 +30,13 @@ public class LoginRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
 }

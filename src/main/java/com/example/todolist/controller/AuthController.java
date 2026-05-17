@@ -61,13 +61,13 @@ public class AuthController {
 
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getUsername() + "|" + request.getTenantId(), request.getPassword())
             );
             loginAttemptService.loginSucceeded(request.getUsername());
-            UserAccount user = authService.findByUsernameOrEmail(request.getUsername());
+            UserAccount user = authService.findByUsernameOrEmailAndTenantId(request.getUsername(), request.getTenantId());
             String jwt = jwtTokenProvider.generateToken(user);
             AuthResponse response = new AuthResponse(user.getUsername(), user.getTenantId(), jwt);
-            logger.info("Login successful for user: {}", user.getUsername());
+            logger.info("Login successful for user: {} tenant: {}", user.getUsername(), user.getTenantId());
             return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
         } catch (AuthenticationException ex) {
             loginAttemptService.loginFailed(request.getUsername());

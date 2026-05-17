@@ -5,6 +5,7 @@ import com.example.todolist.dto.PageResponse;
 import com.example.todolist.dto.TodoRequest;
 import com.example.todolist.model.Todo;
 import com.example.todolist.model.UserAccount;
+import com.example.todolist.security.UserPrincipal;
 import com.example.todolist.service.AuthService;
 import com.example.todolist.service.TodoService;
 import jakarta.validation.Valid;
@@ -34,6 +35,16 @@ public class TodoController {
     }
 
     private String tenantIdFrom(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserPrincipal userPrincipal) {
+            return userPrincipal.getTenantId();
+        }
+
+        Object details = authentication.getDetails();
+        if (details instanceof String tenantId && !tenantId.isBlank()) {
+            return tenantId;
+        }
+
         UserAccount user = authService.findByUsername(authentication.getName());
         return user.getTenantId();
     }
@@ -66,13 +77,7 @@ public class TodoController {
     public ResponseEntity<ApiResponse<Todo>> createTodo(@Valid @RequestBody TodoRequest request, Authentication authentication) {
         String tenantId = tenantIdFrom(authentication);
         logger.info("Creating new todo for tenant: {} - Topic: {}", tenantId, request.getTopic());
-        Todo todo = new Todo();
-        todo.setTopic(request.getTopic());
-        todo.setSummaryPoints(request.getSummaryPoints());
-        todo.setStatus(request.getStatus());
-        todo.setPriority(request.getPriority());
-        todo.setSection(request.getSection());
-        Todo createdTodo = todoService.createTodo(todo, tenantId, authentication.getName());
+        Todo createdTodo = todoService.createTodo(request, tenantId, authentication.getName());
         logger.info("Todo created successfully with ID: {} for tenant: {}", createdTodo.getId(), tenantId);
         return ResponseEntity.ok(ApiResponse.success(createdTodo, "Todo created"));
     }
@@ -81,13 +86,7 @@ public class TodoController {
     public ResponseEntity<ApiResponse<Todo>> updateTodo(@PathVariable String id, @Valid @RequestBody TodoRequest request, Authentication authentication) {
         String tenantId = tenantIdFrom(authentication);
         logger.info("Updating todo with ID: {} for tenant: {} - New topic: {}", id, tenantId, request.getTopic());
-        Todo todo = new Todo();
-        todo.setTopic(request.getTopic());
-        todo.setSummaryPoints(request.getSummaryPoints());
-        todo.setStatus(request.getStatus());
-        todo.setPriority(request.getPriority());
-        todo.setSection(request.getSection());
-        Todo updatedTodo = todoService.updateTodo(id, todo, tenantId, authentication.getName());
+        Todo updatedTodo = todoService.updateTodo(id, request, tenantId, authentication.getName());
         logger.info("Todo updated successfully with ID: {} for tenant: {}", updatedTodo.getId(), tenantId);
         return ResponseEntity.ok(ApiResponse.success(updatedTodo, "Todo updated"));
     }

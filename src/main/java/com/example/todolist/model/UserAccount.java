@@ -19,6 +19,11 @@ public class UserAccount {
     @Indexed(unique = true)
     private String emailAddress;
 
+    @Indexed(unique = true)
+    private Number phoneNumber;
+
+    private String name;
+
     public UserAccount() {
     }
 
@@ -43,6 +48,22 @@ public class UserAccount {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Number getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(Number phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {

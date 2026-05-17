@@ -2,6 +2,7 @@ package com.example.todolist.config;
 
 import com.example.todolist.security.JwtAuthenticationFilter;
 import com.example.todolist.security.RestAuthenticationEntryPoint;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +25,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
-                                                  RestAuthenticationEntryPoint authEntryPoint) throws Exception {
+                                                  RestAuthenticationEntryPoint authEntryPoint,
+                                                  @Value("${server.ssl.enabled:false}") boolean sslEnabled) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -36,8 +38,11 @@ public class SecurityConfig {
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form.disable())
-            .httpBasic(httpBasic -> httpBasic.disable())
-            .requiresChannel(channel -> channel.anyRequest().requiresSecure());
+            .httpBasic(httpBasic -> httpBasic.disable());
+
+        if (sslEnabled) {
+            http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
+        }
 
         return http.build();
     }

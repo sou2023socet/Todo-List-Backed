@@ -1,13 +1,13 @@
 # Todo List Backend
 
 This is the Spring Boot backend for the multi-platform Todo List system.
-It is built with Spring Boot 3.x, Spring Data MongoDB, and session-based authentication.
+It is built with Spring Boot 3.x, Spring Data MongoDB, and JWT-based authentication.
 
 ## Features
 
 - MongoDB persistence for Todo and User entities
 - Tenant-based data isolation using `tenantId`
-- Session-based authentication with login, registration, and logout
+- JWT-based authentication with login and registration
 - Standardized JSON responses with `status_code`, `message`, `data`, and `timestamp`
 - CRUD operations for todos
 - Section/group filtering for todos
@@ -37,8 +37,51 @@ It is built with Spring Boot 3.x, Spring Data MongoDB, and session-based authent
 mvn spring-boot:run
 ```
 
-4. The application is configured to run on HTTPS port `8443` by default.
-5. On first startup, the application will automatically create sample users and todos for testing.
+4. The application is configured to run on HTTP port `8080` by default for local development.
+5. To enable HTTPS in production, set `SSL_ENABLED=true` and provide a valid `SSL_KEY_STORE`.
+6. On first startup, the application will automatically create sample users and todos for testing.
+
+## Accessing the backend
+
+- Local base URL: `http://localhost:8080`
+- Production HTTPS URL: `https://{host}:8443` when `SSL_ENABLED=true`.
+- Authenticate using `POST /api/auth/login` and include the returned JWT token in the `Authorization` header as `Bearer {token}` for all protected requests.
+- Use `POST /api/auth/register` to create a new user.
+- Todo endpoints are protected and require a valid JWT token.
+- For frontend-aware responses, use dedicated endpoints or add the `X-Frontend-Client` header.
+
+### Sample auth request
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123","tenantId":"default-tenant"}'
+```
+
+### Sample auth response
+
+```json
+{
+  "status_code": 200,
+  "message": "Login successful",
+  "data": {
+    "username": "admin",
+    "tenantId": "default-tenant",
+    "token": "<jwt-token>"
+  },
+  "timestamp": "2026-05-17T12:00:00Z"
+}
+```
+
+### Using the JWT token
+
+- Add header: `Authorization: Bearer <jwt-token>`
+- Example Todo request:
+
+```bash
+curl -X GET http://localhost:8080/api/todo \
+  -H "Authorization: Bearer <jwt-token>"
+```
 
 ## Logging
 
@@ -101,8 +144,7 @@ All sample data uses the tenant ID `default-tenant`.
 
 ### Authentication
 - `POST /api/auth/register` - register a new user
-- `POST /api/auth/login` - login and create a session
-- `POST /api/auth/logout` - invalidate the session
+- `POST /api/auth/login` - login and receive a JWT token
 
 ### Todos
 - `GET /api/todo` - get all todos for the current tenant

@@ -2,12 +2,12 @@
 
 ## 1. System Infrastructure
 
-- **Base URL:** `https://{host}:8443`
-- **Protocol:** HTTPS only
-- **Port:** `8443`
+- **Base URL (local dev):** `http://localhost:8080`
+- **Protocol:** HTTP by default for local development; HTTPS when `SSL_ENABLED=true`
+- **Port:** `8080` (default local) / `8443` (when SSL enabled)
 - **Spring Boot:** `3.3.3`
 - **Persistence:** MongoDB via Spring Data MongoDB
-- **Authentication:** HTTP session + CSRF
+- **Authentication:** JWT bearer token
 - **Configuration:** externalized via environment variables
 
 > Production configuration is externalized. The application reads MongoDB settings from `MONGODB_URI` and SSL settings from `SSL_*` environment variables.
@@ -25,13 +25,13 @@
 
 ### 1.2 Security Model
 
-- **Session-based authentication** using Spring Security HTTP session
-- **Login:** `POST /api/auth/login` creates a new session
-- **Logout:** `POST /api/auth/logout` invalidates the session
-- **Session cookie:** `JSESSIONID`
-- **CSRF protection:** enabled globally with `CookieCsrfTokenRepository`
+- **JWT bearer token authentication** using Spring Security stateless filter chain
+- **Login:** `POST /api/auth/login` returns a JWT token
+- **Logout:** client-side token discard; no server session invalidation required
+- **Token header:** `Authorization: Bearer <token>`
+- **CSRF protection:** disabled for stateless token-based API requests
 - **Form login and HTTP Basic:** disabled
-- **Request channel security:** HTTPS required for all endpoints
+- **Request channel security:** HTTPS required for all endpoints when SSL is enabled
 - **Rate limiting:** failed login attempts are throttled and return `429 Too Many Requests`
 
 ### 1.3 Tenant Isolation

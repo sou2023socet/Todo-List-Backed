@@ -1,7 +1,7 @@
 server:
-  port: 8443
+  port: 8080
   ssl:
-    enabled: ${SSL_ENABLED:true}
+    enabled: ${SSL_ENABLED:false}
     key-store: ${SSL_KEY_STORE:classpath:keystore.p12}
     key-store-password: ${SSL_KEY_STORE_PASSWORD:Saloni@Love}
     key-store-type: ${SSL_KEY_STORE_TYPE:PKCS12}
