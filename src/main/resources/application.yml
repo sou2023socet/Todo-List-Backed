@@ -1,0 +1,35 @@
+server:
+  port: 8443
+  ssl:
+    enabled: ${SSL_ENABLED:true}
+    key-store: ${SSL_KEY_STORE:classpath:keystore.p12}
+    key-store-password: ${SSL_KEY_STORE_PASSWORD:Saloni@Love}
+    key-store-type: ${SSL_KEY_STORE_TYPE:PKCS12}
+    key-alias: ${SSL_KEY_ALIAS:tomcat}
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/todoapp}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+jwt:
+  secret: ${JWT_SECRET:ReplaceThisWithAStrongSecretKeyOfAtLeast32Characters}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
+logging:
+  level:
+    com.example.todolist: INFO
+    com.example.todolist.config.RequestLoggingInterceptor: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

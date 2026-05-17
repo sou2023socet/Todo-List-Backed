@@ -1,0 +1,16 @@
+# Ignore compiled bytecode folder
+/target/
+
+# Ignore temp data and cookies
+cookies.txt
+
+# Ignore log files
+*.log
+
+# Ignore local OS files
+.DS_Store
+Thumbs.db
+
+# Security: Ignore SSL/TLS private keys if they are inside resources
+src/main/resources/*.p12
+src/main/resources/*.pem
